@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -32,13 +33,34 @@ Route::post("/about" , function(){
 
 
 Route::get('tasks' , function(){
-    return view('tasks');
+    $tasks = DB::table('tasks')->get();
+    return view('tasks', compact('tasks'));
 });
 
 Route::post('create' , function (){
     DB::table('tasks')->insert([
         'name' => $_POST['name'],
     ]);
-    return view('tasks')
-    ;
+    return redirect()->back();
+});
+
+Route::post('delete/{id}' , function ($id){
+    // DB::table('tasks')->delete($id);
+    DB::table('tasks')->where('id' ,$id)->delete();
+    return redirect()->back();
+});
+
+Route::post('edit/{id}' , function ($id){
+    $task = DB::table('tasks')->where('id' , $id)->first();
+    $tasks = DB::table('tasks')->get();
+    return view('tasks' , compact("task" , "tasks"));
+});
+
+
+Route::post('update', function (){
+    DB::table('tasks')->where("id" , $_POST['id'])->update([
+        "name" => $_POST['name']
+    ]);
+
+    return redirect('/tasks');
 });
